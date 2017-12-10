@@ -8,7 +8,7 @@ Message digest algorithm: SHA-256
 
 https://en.wikipedia.org/wiki/SHA-2
 
-These scripts have been created for general use under the LICENCE terms.
+These scripts have been created for general use under the LICENSE terms.
 
 They are standard POSIX shell scripts, so you most probably can run it in every Linux environment.
 
