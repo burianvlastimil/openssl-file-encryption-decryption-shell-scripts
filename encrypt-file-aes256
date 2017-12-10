@@ -1,0 +1,62 @@
+#!/bin/sh
+
+RED="\\033[1;31m"
+YELLOW="\\033[1;33m"
+NOCOLOR="\\033[0m"
+
+if [ "$#" -eq 0 ]
+then
+    echo "One argument needs to be given. Both relative, and absolute file paths are supported. Exiting (1)."
+    exit 1
+fi
+
+if [ "$#" -gt 1 ]
+then
+    echo "Multiple arguments are not supported. Exiting (2)."
+    exit 2
+fi
+
+if [ ! -f "$1" ]
+then
+    echo "The given argument is not an existing file. Exiting (3)."
+    exit 3
+fi
+
+input_filename="$1"
+
+if [ ! -r "$input_filename" ]
+then
+    echo "Input file is not readable by you. Exiting (4)."
+    exit 4
+fi
+
+input_filepath=$(dirname "$input_filename")
+
+if [ ! -w "$input_filepath" ]
+then
+    echo "Destination directory is not writable by you. Exiting (5)."
+    exit 5
+fi
+
+output_filename="$input_filename".enc
+
+if [ -f "$output_filename" ]
+then
+    echo "Destination file exists. Exiting (6)."
+    exit 6
+fi
+
+if ! pv --wait "$input_filename" | openssl enc -aes-256-cbc -md sha256 -salt -out "$output_filename" 2> /dev/null
+then
+    echo "${RED}Encryption failed. Exiting (7).${NOCOLOR}"
+
+    if [ -f "$output_filename" ]
+    then
+        rm "$output_filename"
+    fi
+
+    exit 7
+else
+    echo "${YELLOW}Encryption successful.${NOCOLOR}"
+    exit 0
+fi
