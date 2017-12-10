@@ -1,6 +1,8 @@
-# OpenSSL file encryption / decryption POSIX shell scripts
+# OpenSSL file encryption / decryption shell scripts
 
 These scripts have been created for general use.
+
+They are standard POSIX shell scripts, so you most probably can run it in every Linux environment.
 
 They should contain every safety measure / error check, that I thought of.
 
@@ -63,3 +65,11 @@ Multiple arguments (files) are currently not supported, but I plan on implementi
 6 - Destination file exists.
 
 7 - Failed encryption / decryption.
+
+
+----------------------------------------------------------------
+
+
+# Reporting bugs and suggestions
+
+Please send an email to me: info@vlastimilburian.cz
