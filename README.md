@@ -16,9 +16,7 @@ Multiple arguments (files) are currently not supported, but I plan on implementi
     ./encrypt-file-aes256 filename
     ```
 
-    will always produce the `filename` with `.enc` extension,
-    even if you encrypt a file multiple files,
-    for instance the following file:
+    will always produce the `filename` with `.enc` extension, even if you encrypt a file multiple files, for instance the following file:
 
     ```
     filename.enc.enc.enc
@@ -44,3 +42,24 @@ Multiple arguments (files) are currently not supported, but I plan on implementi
     ```
     filename.dec
     ```
+    
+----------------------------------------------------------------
+
+
+# Exit codes
+
+0 - Successful encryption / decryption.
+
+1 - One argument needs to be given. Both relative, and absolute file paths are supported.
+
+2 - Multiple arguments are not supported.
+
+3 - The given argument is not an existing file.
+
+4 - Input file is not readable by you.
+
+5 - Destination directory is not writable by you.
+
+6 - Destination file exists.
+
+7 - Failed encryption / decryption.
