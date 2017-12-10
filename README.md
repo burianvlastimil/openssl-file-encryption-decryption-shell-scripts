@@ -1,5 +1,9 @@
 # OpenSSL file encryption / decryption shell scripts
 
+Cipher: AES-256-CBC
+
+Message digest algorithm: SHA-256
+
 These scripts have been created for general use.
 
 They are standard POSIX shell scripts, so you most probably can run it in every Linux environment.
