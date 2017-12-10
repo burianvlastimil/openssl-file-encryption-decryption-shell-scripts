@@ -1,8 +1,10 @@
 # OpenSSL file encryption / decryption shell scripts
 
-Cipher: AES-256-CBC
+Cipher: AES-256 in CBC mode
 
 https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
+
+https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Cipher_Block_Chaining_(CBC)
 
 Message digest algorithm: SHA-256
 
