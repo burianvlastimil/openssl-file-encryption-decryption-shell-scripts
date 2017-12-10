@@ -2,11 +2,19 @@
 
 Cipher: AES-256-CBC
 
+https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
+
 Message digest algorithm: SHA-256
 
-These scripts have been created for general use.
+https://en.wikipedia.org/wiki/SHA-2
+
+These scripts have been created for general use under the LICENCE terms.
 
 They are standard POSIX shell scripts, so you most probably can run it in every Linux environment.
+
+https://en.wikipedia.org/wiki/POSIX
+
+https://en.wikipedia.org/wiki/Unix_shell
 
 They should contain every safety measure / error check, that I thought of.
 
