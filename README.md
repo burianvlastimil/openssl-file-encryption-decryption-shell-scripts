@@ -118,6 +118,20 @@ sudo rm /usr/local/bin/encrypt-file-aes256 /usr/local/bin/decrypt-file-aes256
 
 ----------------------------------------------------
 
+# Testing
+
+I did the following tests so far:
+
+- every fail exit code has been tested: PASS
+
+- encrypting / decrypting a very small file, 1 KB: PASS
+
+- encrypting / decrypting a medium size file, 15 GB: PASS
+
+- encrypting / decrypting a very large file, 750 GB: PASS
+
+----------------------------------------------------
+
 
 # Reporting bugs and suggestions
 
