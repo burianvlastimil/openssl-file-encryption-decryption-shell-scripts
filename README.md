@@ -23,7 +23,7 @@ They should contain every safety measure / error check, that I thought of.
 Multiple arguments (files) are currently not supported, but I plan on implementing it in the future.
 
 
-----------------------------------------------------------------
+----------------------------------------------------
 
 
 # Download and Installation
@@ -44,7 +44,19 @@ Multiple arguments (files) are currently not supported, but I plan on implementi
     sudo install -m 0755 -o root -g root -t /usr/local/bin ??crypt-file-aes256
     ```
 
+
 ----------------------------------------------------
+
+
+# Uninstallation / Removal
+
+```
+sudo rm /usr/local/bin/encrypt-file-aes256 /usr/local/bin/decrypt-file-aes256
+```
+
+
+----------------------------------------------------
+
 
 # Usage
 
@@ -80,8 +92,9 @@ Multiple arguments (files) are currently not supported, but I plan on implementi
     ```
     filename.dec
     ```
-    
-----------------------------------------------------------------
+
+
+----------------------------------------------------
 
 
 # Exit codes
@@ -103,7 +116,7 @@ Multiple arguments (files) are currently not supported, but I plan on implementi
 7 - Failed encryption / decryption.
 
 
-----------------------------------------------------------------
+----------------------------------------------------
 
 
 # Reporting bugs and suggestions
