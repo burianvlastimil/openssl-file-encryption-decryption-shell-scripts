@@ -22,6 +22,28 @@ They should contain every safety measure / error check, that I thought of.
 
 Multiple arguments (files) are currently not supported, but I plan on implementing it in the future.
 
+
+----------------------------------------------------------------
+
+
+# Download and Installation
+
+
+1. Download it from this repository using `git`:
+    ```
+    git clone https://github.com/burianvlastimil/openssl-file-encryption-decryption-shell-scripts
+    ```
+
+2. Go to the downloaded directory:
+    ```
+    cd openssl-file-encryption-decryption-shell-scripts/
+    ```
+
+3. Install it for example to `/usr/local/bin`:
+    ```
+    sudo install -m 0755 -o root -g root -t /usr/local/bin ??crypt-file-aes256
+    ```
+
 ----------------------------------------------------
 
 # Usage
@@ -29,7 +51,7 @@ Multiple arguments (files) are currently not supported, but I plan on implementi
 1. Encryption
 
     ```
-    ./encrypt-file-aes256 filename
+    encrypt-file-aes256 filename
     ```
 
     will always produce the `filename` with `.enc` extension, even if you encrypt a file multiple files, for instance the following file:
@@ -43,7 +65,7 @@ Multiple arguments (files) are currently not supported, but I plan on implementi
 2. Decryption
 
     ```
-    ./decrypt-file-aes256 filename.enc
+    decrypt-file-aes256 filename.enc
     ```
     
     will strip the defined `.enc` extension and produce a file named:
