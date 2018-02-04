@@ -20,7 +20,7 @@ https://en.wikipedia.org/wiki/Unix_shell
 
 They should contain every safety measure / error check, that I thought of.
 
-Multiple arguments (files) are currently not supported, but I plan on implementing it in the future.
+Multiple arguments (files) are currently not supported.
 
 
 ----------------------------------------------------
@@ -39,9 +39,9 @@ Multiple arguments (files) are currently not supported, but I plan on implementi
     cd openssl-file-encryption-decryption-shell-scripts/
     ```
 
-3. Install it for example to `/usr/local/bin`:
+3. You may either copy it manually, or install it to `/usr/local/bin` using bundled `Makefile`:
     ```
-    sudo install -m 0755 -o root -g root -t /usr/local/bin ??crypt-file-aes256
+    sudo make install
     ```
 
 
@@ -50,8 +50,11 @@ Multiple arguments (files) are currently not supported, but I plan on implementi
 
 # Uninstallation / Removal
 
+It is as simple as the installation method you chose.
+If you've chosen to use the `Makefile` method, it's as simple as:
+
 ```
-sudo rm /usr/local/bin/encrypt-file-aes256 /usr/local/bin/decrypt-file-aes256
+sudo make uninstall
 ```
 
 
