@@ -51,7 +51,7 @@ Multiple arguments (files) are currently not supported.
 # Uninstallation / Removal
 
 It is as simple as the installation method you chose.
-If you've chosen to use the `Makefile` method, it's as simple as:
+If you have chosen to use the `Makefile` method, it is as simple as:
 
 ```
 sudo make uninstall
