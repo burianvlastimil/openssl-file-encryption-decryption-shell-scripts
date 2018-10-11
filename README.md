@@ -43,6 +43,13 @@ Multiple arguments (files) are currently not supported.
     ```
     sudo make install
     ```
+   
+   You may also **override the default destination location** using `DESTDIR`:
+   ```
+   sudo DESTDIR=/usr/bin make install
+   ```
+   
+   Note for Cygwin users: You do not need / actually cannot to use `sudo`, just omit it.
 
 
 ----------------------------------------------------
@@ -132,6 +139,37 @@ I did the following tests so far:
 - encrypting / decrypting a medium size file, 15 GB: PASS
 
 - encrypting / decrypting a very large file, 750 GB: PASS
+
+----------------------------------------
+
+# If you like the script, consider donating any amount to my cryptocurrency accounts
+
+**Bitcoin**
+```
+32fD1Qkx5Kf6GbjewTLhBkjrZGryYjTotS
+```
+
+**Bitcoin Cash**
+```
+qrsh8dwwrpvdxj6le8gvv9uq0u72zzmjzvger0qzd6
+```
+
+**Ethereum**
+```
+0x2537a26e5F8AF085Fce9fBe0e45BDA6dBa0c0349
+```
+
+**Ethereum Classic**
+```
+0x3fbf8Cba84FAB0F3Bd5aaa7a81663e4831fb5eC4
+```
+
+**Litecoin**
+```
+MNg1JdTmC1FmYLiGiB5XzRRXJVg325X84Y
+```
+
+Thank you!
 
 ----------------------------------------------------
 
