@@ -1,5 +1,6 @@
 # OpenSSL file encryption / decryption shell scripts
 
+
 Cipher: AES-256 in CBC mode
 
 https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
@@ -20,36 +21,64 @@ https://en.wikipedia.org/wiki/Unix_shell
 
 They should contain every safety measure / error check, that I thought of.
 
-Multiple arguments (files) are currently not supported.
+Multiple arguments (files) and / or pipes are currently not supported.
 
 
 ----------------------------------------------------
 
 
-# Download and Installation
+# Download, Authenticity check, and Extract
 
 
-1. Download it from this repository using `git`:
+1. Download the latest release and its signature from here:
+
+    https://github.com/burianvlastimil/openssl-file-encryption-decryption-shell-scripts/releases/latest
+
+2. Go to the download directory, where you have saved the files (note that you need the signature file too).
+
+3. Import my public GPG key:
+
     ```
-    git clone https://github.com/burianvlastimil/openssl-file-encryption-decryption-shell-scripts
+    gpg --recv-keys 7D2E022E39A88ACF3EF6D4498F37AF4CE46008C3
     ```
 
-2. Go to the downloaded directory:
+4. Verify autenticity of the archive:
+
     ```
-    cd openssl-file-encryption-decryption-shell-scripts/
+    gpg --verify openssl-encryption.tar.xz.asc openssl-encryption.tar.xz
     ```
 
-3. You may either copy it manually, or install it to `/usr/local/bin` using bundled `Makefile`:
+5. Extract the `zx` packed tarball with:
+
+    ```
+    tar -xJvf openssl-encryption.tar.xz
+    ```
+
+----------------------------------------------------
+
+
+# Installation
+
+
+There are basically 3 ways to install the scripts:
+
+
+1. **Easy** being to use the Makefile's default location, which is `/usr/local/bin`:
+
     ```
     sudo make install
     ```
-   
-   You may also **override the default destination location** using `DESTDIR`:
-   ```
-   sudo DESTDIR=/usr/bin make install
-   ```
-   
-   Note for Cygwin users: You do not need / actually cannot to use `sudo`, just omit it.
+
+2. **Advanced** users may install the scripts wherever they wish, in this example to current directory's `./test` sub-directory:
+
+    ```
+    make install PREFIX=./test
+    ```
+
+    Note 1: the destination directory will be created if it does not exist.
+    Note 2: `sudo` is not needed in this case, so even non-root users can install them easily.
+
+3. **Experts** may avoid the `Makefile` altogether and copy the two files into whichever destination they wish.
 
 
 ----------------------------------------------------
@@ -58,11 +87,20 @@ Multiple arguments (files) are currently not supported.
 # Uninstallation / Removal
 
 It is as simple as the installation method you chose.
-If you have chosen to use the `Makefile` method, it is as simple as:
 
-```
-sudo make uninstall
-```
+1. If you have chosen to use the `Makefile` method #1, it is as simple as:
+
+    ```
+    sudo make uninstall
+    ```
+
+2. If you have chosen to use the `Makefile` method #2, it is also very easy:
+
+    ```
+    make uninstall PREFIX=./test
+    ```
+
+3. If you have chosen to avoid the makefile, you are advanced enough to handle this.
 
 
 ----------------------------------------------------
@@ -96,7 +134,7 @@ sudo make uninstall
     filename
     ```
     
-    But it has to be possible to decrypt files without the defined extension.
+    Note, that it is entirely possible to decrypt files without the defined extension.
     In this case we will append `.dec` to the filename and produce for example:
     
     ```
@@ -111,19 +149,7 @@ sudo make uninstall
 
 0 - Successful encryption / decryption.
 
-1 - One argument needs to be given. Both relative, and absolute file paths are supported.
-
-2 - Multiple arguments are not supported.
-
-3 - The given argument is not an existing file.
-
-4 - Input file is not readable by you.
-
-5 - Destination directory is not writable by you.
-
-6 - Destination file exists.
-
-7 - Failed encryption / decryption.
+1 - Some error occurred. 
 
 
 ----------------------------------------------------
