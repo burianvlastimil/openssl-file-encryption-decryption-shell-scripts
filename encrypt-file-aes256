@@ -116,7 +116,7 @@ check_for_prerequisites()
     done
 }
 
-check_for_prerequisites openssl file grep df tail awk
+check_for_prerequisites openssl df tail awk
 
 #------------------------------------------------------------------------------
 
