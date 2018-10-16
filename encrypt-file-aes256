@@ -1,50 +1,254 @@
 #!/bin/sh
 
-bold=$(tput bold)
-red=$(tput setaf 1)
-yellow=$(tput setaf 3)
-nocolor=$(tput sgr0)
+###############################################################################
+##                OpenSSL file encryption POSIX shell script                 ##
+##                             revision: 1.0                                 ##
+##                        GitHub: https://git.io/fxslm                       ##
+###############################################################################
 
-bold_red=${bold}${red}
-bold_yellow=${bold}${yellow}
+# shellcheck disable=SC2016
+# disable shellcheck information SC2016 globally for the script
+# link to wiki: https://github.com/koalaman/shellcheck/wiki/SC2016
+# reason: the script's main parts use constructs like that
 
-print_error_and_exit()
+# treat unset variables as an error when substituting
+set -o nounset
+
+# pipe will be considered successful only if all the commands involved are executed without errors
+# ERROR: Illegal option -o pipefail. This likely works in Bash and alike only.
+#set -o pipefail
+
+#------------------------------------------------------------------------------
+
+colors_supported()
 {
-    echo "${bold_red}$1 Exit code = $2.${nocolor}"
-    exit "$2"
+    command -v tput > /dev/null 2>&1 && tput setaf 1 > /dev/null 2>&1
 }
 
-[ "$#" -eq 0 ] \
-&& print_error_and_exit "One argument needs to be given. Both relative, and absolute file paths are supported." 1
+#------------------------------------------------------------------------------
 
-[ "$#" -gt 1 ] \
-&& print_error_and_exit "Multiple arguments are not supported." 2
+print_error_and_exit()
+# expected arguments:
+# $1 = exit code
+# $2 = error origin (usually function name)
+# $3 = error message
+{
+    # redirect all output of this function to standard error stream
+    exec 1>&2
 
-[ ! -f "$1" ] \
-&& print_error_and_exit "The given argument is not an existing file." 3
+    # check if exactly 3 arguments have been passed
+    # if not, print out an internal error without colors
+    if [ "${#}" -ne 3 ]
+    then
+        printf 'print_error_and_exit internal error\n\n\tWrong number of arguments has been passed: %b!\n\tExpected the following 3:\n\t\t$1 - exit code\n\t\t$2 - error origin\n\t\t$3 - error message\n\nexit code = 1\n' "${#}"
+        exit 1
+    fi
 
-input_filename="$1"
+    # check if the first argument is a number
+    # if not, print out an internal error without colors
+    if ! [ "${1}" -eq "${1}" ] 2> /dev/null
+    then
+        printf 'print_error_and_exit internal error\n\n\tThe first argument is not a number: %b!\n\tExpected an exit code from the script.\n\nexit code = 1\n' "${1}"
+        exit 1
+    fi
 
-[ ! -r "$input_filename" ] \
-&& print_error_and_exit "Input file is not readable by you." 4
+    # check if we have color support
+    if colors_supported
+    then
+        # color definitions
+        readonly bold=$(tput bold)
+        readonly red=$(tput setaf 1)
+        readonly white=$(tput setaf 7)
+        readonly yellow=$(tput setaf 3)
+        readonly nocolor=$(tput sgr0)
 
-input_filepath=$(dirname "$input_filename")
+        # here we have color support, so we highlight everything in different color
+        printf '%b\n\n\t%b\n\n%b\n' \
+            "${bold}${yellow}${2}${nocolor}" \
+            "${bold}${white}${3}${nocolor}" \
+            "${bold}${red}Error occurred, see above.${nocolor}"
+    else
+        # here we do not have color support
+        printf '%b\n\n\t%b\n\n%b\n' \
+            "${2}" \
+            "${3}" \
+            "Error occurred, see above."
+    fi
 
-[ ! -w "$input_filepath" ] \
-&& print_error_and_exit "Destination directory is not writable by you." 5
+    exit "${1}"
+}
 
-output_filename="$input_filename".enc
+#------------------------------------------------------------------------------
 
-[ -f "$output_filename" ] \
-&& print_error_and_exit "Destination file exists." 6
+# in this function, the SC2120 warning is irrelevant and safe to ignore
+# link to wiki: https://github.com/koalaman/shellcheck/wiki/SC2120
+# shellcheck disable=SC2120
+am_i_root()
+# expected arguments: none
+{
+    # check if no argument has been passed
+    [ "${#}" -eq 0 ] || print_error_and_exit 1 "am_i_root" "Some arguments have been passed to the function!\\n\\tNo arguments expected.\\n\\tPassed: ${*}"
 
-if ! pv -W "$input_filename" | openssl enc -aes-256-cbc -md sha256 -salt -out "$output_filename" 2> /dev/null
+    # check if the user is root
+    # this will return an exit code of the command itself directly
+    [ "$(id -u)" -eq 0 ]
+}
+
+# check if the user had by any chance run the script with root privileges
+# if you need to run it as root, feel free to comment out the line below
+# in this function call, the SC2119 information is irrelevant and safe to ignore
+# link to wiki: https://github.com/koalaman/shellcheck/wiki/SC2119
+# shellcheck disable=SC2119
+am_i_root && print_error_and_exit 1 "am_i_root" "Running this script with root privileges is discouraged!\\n\\tQuiting to shell."
+
+#------------------------------------------------------------------------------
+
+check_for_prerequisites()
+# expected arguments:
+# any number of commands / program names
+{
+    while [ "${#}" -gt 0 ]
+    do
+        # check if the argument is a program which is installed
+        command -v "${1}" > /dev/null 2>&1 || print_error_and_exit 1 "check_for_prerequisites" "This script requires '${1}' but it is not installed or available on this system!\\n\\tPlease install the corresponding package manually."
+        # move to the next argument
+        shift
+    done
+}
+
+check_for_prerequisites openssl file grep df tail awk
+
+#------------------------------------------------------------------------------
+
+is_number()
+# expected arguments:
+# $1 = variable or literal
+{
+    # check if exactly one argument has been passed
+    [ "${#}" -eq 1 ] || print_error_and_exit 1 "is_number" "Exactly one argument has not been passed to the function!\\n\\tOne variable or literal to test expected.\\n\\tPassed: ${*}"
+
+    # check if the argument is an integer number
+    # this will return an exit code of the command itself directly
+    [ "${1}" -eq "${1}" ] 2> /dev/null
+}
+
+#------------------------------------------------------------------------------
+
+print_usage_and_exit()
+{
+    # check if exactly one argument has been passed
+    [ "${#}" -eq 1 ] || print_error_and_exit 1 "print_usage_and_exit" "Exactly one argument has not been passed to the function!\\n\\tPassed: ${*}"
+
+    # check if the argument is a number
+    is_number "${1}" || print_error_and_exit 1 "print_usage_and_exit" "The argument is not a number!\\n\\Expected an exit code from the script.\\n\\tPassed: ${1}"
+
+    # in case of non-zero exit code given, redirect all output to stderr
+    [ "${1}" -ne 0 ] && exec 1>&2
+
+    echo "Usage: ${0} [-o directory] file"
+    echo
+    echo "       -o directory: Write the output file into the given directory;"
+    echo "                     Optional and must be given before the file."
+    echo
+    echo "       file: Regular file to encrypt."
+
+    exit "${1}"
+}
+
+#------------------------------------------------------------------------------
+
+given_output_directory=
+while getopts ":ho:" option
+do
+    case "${option}" in
+        o)
+            given_output_directory=${OPTARG}
+            ;;
+        h)
+            print_usage_and_exit 0
+            ;;
+        *)
+            print_usage_and_exit 1
+            ;;
+    esac
+done
+shift $(( OPTIND - 1 ))
+
+#------------------------------------------------------------------------------
+
+[ "${#}" -eq 0 ] && print_usage_and_exit 1
+
+#------------------------------------------------------------------------------
+
+[ "${#}" -gt 1 ] && print_error_and_exit 1 "[ ${#} -gt 1 ]" "You have passed ${#} arguments to the script!\\n\\tOnly one file expected.\\n\\tPassed: ${*}"
+
+#------------------------------------------------------------------------------
+
+[ -f "${1}" ] || print_error_and_exit 1 "[ -f ${1} ]" "The given argument is not an existing regular file!\\n\\tPassed: ${1}"
+
+#------------------------------------------------------------------------------
+
+input_file=${1}
+[ -r "${input_file}" ] || print_error_and_exit 1 "[ -r ${input_file} ]" "Input file is not readable by you!\\n\\tPassed: ${input_file}"
+
+#------------------------------------------------------------------------------
+
+# parameter substitution with - modifier will cause the output_directory
+# variable to to get dirname ... in case given_output_directory is empty
+output_directory=${given_output_directory:-$(dirname "${input_file}")}
+
+[ -d "${output_directory}" ] || print_error_and_exit 1 "[ -d ${output_directory} ]" "Destination:\\n\\t\\t${output_directory}\\n\\tis not a directory!"
+
+[ -w "${output_directory}" ] || print_error_and_exit 1 "[ -w ${output_directory} ]" "Destination directory:\\n\\t\\t${output_directory}\\n\\tis not writable by you!"
+
+#------------------------------------------------------------------------------
+
+filename_extracted_from_path=$(basename "${input_file}")
+
+output_file=${output_directory}/${filename_extracted_from_path}.enc
+
+#------------------------------------------------------------------------------
+
+# -e FILE: True if file exists. Any type of file!
+if [ -e "${output_file}" ]
 then
-    [ -f "$output_filename" ] && rm "$output_filename"
+    echo "Do you want to overwrite the file ${output_file}? Type 'y' if you do."
+    read -r overwrite
+    [ "${overwrite}" = "y" ] || print_error_and_exit 1 "[ ${overwrite} = y ]" "You have decided not to overwrite the file ${output_file}. Aborting."
+fi
 
-    print_error_and_exit "Encryption failed." 7
+#------------------------------------------------------------------------------
+
+file_size=$(du -k "${input_file}" | awk '{ print $1 }')
+free_space=$(df -k "${output_directory}" | tail -n 1 | awk '{ print $4 }')
+
+[ "${free_space}" -gt "${file_size}" ] || print_error_and_exit 1 "[ ${free_space} -gt ${file_size} ]" "There is not enough free space in the destination directory!\\n\\t\\tFile size: ${file_size}\\n\\t\\tFree space: ${free_space}"
+
+#------------------------------------------------------------------------------
+
+# here comes the core part - encryption of the given file
+
+# we shall use 'pv' for files larger than 1GiB if available
+[ "${file_size}" -gt $(( 1024 * 1024 )) ] && use_pv_if_available=0 || use_pv_if_available=1
+
+if [ "${use_pv_if_available}" -eq 0 ] && command -v pv > /dev/null 2>&1
+then
+    pv -W -p -t -e -r -a -b "${input_file}" | openssl enc -aes-256-cbc -md sha256 -salt -out "${output_file}"
 else
-    echo "${bold_yellow}Encryption successful.${nocolor}"
+    openssl enc -aes-256-cbc -md sha256 -salt -in "${input_file}" -out "${output_file}"
+fi
 
-    exit 0
+#------------------------------------------------------------------------------
+
+# in this test, the SC2181 information is safe to ignore
+# link to wiki: https://github.com/koalaman/shellcheck/wiki/SC2181
+# shellcheck disable=SC2181
+if [ "${?}" -eq 0 ]
+then
+    colors_supported && ( tput bold; tput setaf 2 )
+    echo "Encryption successful."
+    colors_supported && tput sgr0
+else
+    [ -f "${output_file}" ] && rm "${output_file}"
+    print_error_and_exit 1 "openssl enc -aes-256-cbc -md sha256 -salt -in ${input_file} -out ${output_file}" "Encryption failed."
 fi
