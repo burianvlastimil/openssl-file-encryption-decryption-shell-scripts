@@ -48,7 +48,7 @@ Multiple arguments (files) and / or pipes are currently not supported.
     gpg --verify openssl-encryption.tar.xz.asc openssl-encryption.tar.xz
     ```
 
-5. Extract the `zx` packed tarball with:
+5. Extract the `xz` packed tarball with:
 
     ```
     tar -xJvf openssl-encryption.tar.xz
