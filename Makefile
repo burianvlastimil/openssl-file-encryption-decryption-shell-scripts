@@ -54,12 +54,12 @@ distrib: root-check SHA512SUM $(encrypt_script) $(decrypt_script) Makefile
 	rm --force $(distrib_name).tar.xz $(distrib_name).tar.xz.asc
 	rm --force --recursive $(distrib_name)
 	mkdir $(distrib_name)
-	cp $(encrypt_script) $(decrypt_script) Makefile SHA512SUM $(distrib_name)
+	cp $(encrypt_script) $(decrypt_script) Makefile SHA512SUM .safeclean-openssl-encryption $(distrib_name)
 	wget --quiet --output-document=$(distrib_name)/LICENSE https://git.io/fxByv
 	wget --quiet --output-document=$(distrib_name)/README https://git.io/fxByJ
 	chmod 755 $(distrib_name)/$(encrypt_script) $(distrib_name)/$(decrypt_script)
 	chmod 644 $(distrib_name)/Makefile $(distrib_name)/SHA512SUM $(distrib_name)/LICENSE $(distrib_name)/README
-	tar --create --file=$(distrib_name).tar $(distrib_name)
+	tar --create --file=$(distrib_name).tar $(distrib_name)/.
 	xz --format=xz -9 --extreme --check=sha256 $(distrib_name).tar
 	rm --force --recursive $(distrib_name)
 	gpg --local-user 7D2E022E39A88ACF3EF6D4498F37AF4CE46008C3 --sign --armor --output $(distrib_name).tar.xz.asc --detach-sig $(distrib_name).tar.xz
