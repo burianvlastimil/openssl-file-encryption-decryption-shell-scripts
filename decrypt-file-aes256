@@ -6,17 +6,8 @@
 ##                        GitHub: https://git.io/fxslm                       ##
 ###############################################################################
 
-# shellcheck disable=SC2016
-# disable shellcheck information SC2016 globally for the script
-# link to wiki: https://github.com/koalaman/shellcheck/wiki/SC2016
-# reason: the script's main parts use constructs like that
-
 # treat unset variables as an error when substituting
 set -o nounset
-
-# pipe will be considered successful only if all the commands involved are executed without errors
-# ERROR: Illegal option -o pipefail. This likely works in Bash and alike only.
-#set -o pipefail
 
 #------------------------------------------------------------------------------
 
@@ -40,6 +31,9 @@ print_error_and_exit()
     # if not, print out an internal error without colors
     if [ "${#}" -ne 3 ]
     then
+        # $1, $2 and $3 are to be shown literally in this message
+        # link to wiki: https://github.com/koalaman/shellcheck/wiki/SC2016
+        # shellcheck disable=SC2016
         printf 'print_error_and_exit internal error\n\n\tWrong number of arguments has been passed: %b!\n\tExpected the following 3:\n\t\t$1 - exit code\n\t\t$2 - error origin\n\t\t$3 - error message\n\nexit code = 1\n' "${#}"
         exit 1
     fi
@@ -80,7 +74,7 @@ print_error_and_exit()
 
 #------------------------------------------------------------------------------
 
-# in this function, the SC2120 warning is irrelevant and safe to ignore
+# don't warn that no caller passes arguments - that's the point of the test
 # link to wiki: https://github.com/koalaman/shellcheck/wiki/SC2120
 # shellcheck disable=SC2120
 am_i_root()
@@ -116,7 +110,7 @@ check_for_prerequisites()
     done
 }
 
-check_for_prerequisites openssl file grep df tail awk
+check_for_prerequisites openssl df du tail awk file grep
 
 #------------------------------------------------------------------------------
 
@@ -239,7 +233,7 @@ fi
 # -e FILE: True if file exists. Any type of file!
 if [ -e "${output_file}" ]
 then
-    printf '%s' "Do you want to overwrite the file ${output_file}? [y/.]"
+    printf '%s' "Do you want to overwrite the file ${output_file}? [y/?]"
     read -r overwrite
     [ "${overwrite}" = "y" ] || print_error_and_exit 1 "[ ${overwrite} = y ]" "You have decided not to overwrite the file ${output_file}. Aborting."
 fi
@@ -267,7 +261,7 @@ fi
 
 #------------------------------------------------------------------------------
 
-# in this test, the SC2181 information is safe to ignore
+# testing $? is clearer than embedding preceding pipeline here
 # link to wiki: https://github.com/koalaman/shellcheck/wiki/SC2181
 # shellcheck disable=SC2181
 if [ "${?}" -eq 0 ]
