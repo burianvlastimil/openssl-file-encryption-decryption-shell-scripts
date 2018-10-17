@@ -202,4 +202,4 @@ Thank you!
 
 # Reporting bugs and suggestions
 
-Please send an email to me: info@vlastimilburian.cz
+Please open a [new issue ticket](https://github.com/burianvlastimil/openssl-file-encryption-decryption-shell-scripts/issues/new).
