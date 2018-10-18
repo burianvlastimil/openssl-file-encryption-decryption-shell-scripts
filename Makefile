@@ -14,7 +14,7 @@ this_file := $(lastword $(MAKEFILE_LIST))
 
 check: $(encrypt_script) $(decrypt_script)
 
-	@echo; tput bold; tput setaf 3; echo Target: $@; tput sgr0; echo
+	@echo; tput bold; tput setaf 3; echo Target: check; tput sgr0; echo
 
 	@if [ -f SHA512SUM ]; then \
 		( \
@@ -29,7 +29,7 @@ check: $(encrypt_script) $(decrypt_script)
 
 install: check
 
-	@echo; tput bold; tput setaf 3; echo Target: $@; tput sgr0; echo
+	@echo; tput bold; tput setaf 3; echo Target: install; tput sgr0; echo
 
 	@[ $(PREFIX) = $(DEFAULT_PREFIX) ] || ( tput bold; tput setaf 4; echo "Information: Installing to non-standard location."; tput sgr0; echo )
 
@@ -41,7 +41,7 @@ install: check
 
 uninstall:
 
-	@echo; tput bold; tput setaf 3; echo Target: $@; tput sgr0; echo
+	@echo; tput bold; tput setaf 3; echo Target: uninstall; tput sgr0; echo
 
 	rm $(install_path)/$(encrypt_script) $(install_path)/$(decrypt_script)
 	rmdir $(install_path) 2> /dev/null || true
@@ -51,7 +51,7 @@ uninstall:
 
 distrib: root-check SHA512SUM $(encrypt_script) $(decrypt_script) Makefile
 
-	@echo; tput bold; tput setaf 3; echo Target: $@; tput sgr0; echo
+	@echo; tput bold; tput setaf 3; echo Target: distrib; tput sgr0; echo
 
 	rm -f $(distrib_name).tar.xz $(distrib_name).tar.xz.asc
 	rm -f -r $(distrib_name)
@@ -71,10 +71,10 @@ distrib: root-check SHA512SUM $(encrypt_script) $(decrypt_script) Makefile
 
 clean: root-check
 
-	@echo; tput bold; tput setaf 3; echo Target: $@; tput sgr0; echo
+	@echo; tput bold; tput setaf 3; echo Target: clean; tput sgr0; echo
 
 	@if [ ! -f .safeclean-$(distrib_name) ]; then \
-		tput bold; tput setaf 1; echo "Error: Target '$@' has to be run from within its Makefile's directory!"; tput sgr0; echo; exit 1; \
+		tput bold; tput setaf 1; echo "Error: Target 'clean' has to be run from within its Makefile's directory!"; tput sgr0; echo; exit 1; \
 	fi
 
 	@ls -l | grep '^d' > /dev/null || echo "There are no more directories."
@@ -95,18 +95,18 @@ force-rebuild-hash-file:
 # real target file
 SHA512SUM: force-rebuild-hash-file root-check $(encrypt_script) $(decrypt_script)
 
-	@echo; tput bold; tput setaf 3; echo Target: $@; tput sgr0; echo
+	@echo; tput bold; tput setaf 3; echo Target: SHA512SUM; tput sgr0; echo
 
-	rm -f $@
-	sha512sum $(encrypt_script) $(decrypt_script) > $@
+	rm -f SHA512SUM
+	sha512sum $(encrypt_script) $(decrypt_script) > SHA512SUM
 
-	@echo; tput bold; tput setaf 2; echo "Ok. The '$@' file has been (re-)generated."; tput sgr0
+	@echo; tput bold; tput setaf 2; echo "Ok. The 'SHA512SUM' file has been (re-)generated."; tput sgr0
 
 
 # special phony target with code for re-use; something like a function
 root-check:
 
 	@if [ $$(id -u) -eq 0 ]; then \
-		echo; tput bold; tput setaf 3; echo $@; tput sgr0; echo; \
+		echo; tput bold; tput setaf 3; echo root-check; tput sgr0; echo; \
 		tput bold; tput setaf 1; echo "Error: The target you invoked needs to be run as normal user!"; tput sgr0; echo; exit 1; \
 	fi
