@@ -14,13 +14,13 @@ this_file := $(lastword $(MAKEFILE_LIST))
 
 check: $(encrypt_script) $(decrypt_script)
 
-	@echo; tput bold; tput setaf 3; echo Target: check; tput sgr0; echo
+	@echo; tput bold || true; tput setaf 3 || true; echo Target: check; tput sgr0 || true; echo
 
 	@if [ -f SHA512SUM ]; then \
 		( \
 			sha512sum -c SHA512SUM && \
-			( tput bold; tput setaf 2; echo; echo "Ok. You may use 'sudo make install' or '(sudo) make install PREFIX=SomeDir' command now."; tput sgr0 ) || \
-			( tput bold; tput setaf 1; echo; echo "Error: Script files hash sum mismatch!"; echo; tput sgr0; exit 1 ) \
+			( tput bold || true; tput setaf 2 || true; echo; echo "Ok. You may use 'sudo make install' or '(sudo) make install PREFIX=SomeDir' command now."; tput sgr0 || true ) || \
+			( tput bold || true; tput setaf 1 || true; echo; echo "Error: Script files hash sum mismatch!"; echo; tput sgr0 || true; exit 1 ) \
 		) \
 	else \
 		$(MAKE) -f $(this_file) SHA512SUM; \
@@ -29,29 +29,29 @@ check: $(encrypt_script) $(decrypt_script)
 
 install: check
 
-	@echo; tput bold; tput setaf 3; echo Target: install; tput sgr0; echo
+	@echo; tput bold || true; tput setaf 3 || true; echo Target: install; tput sgr0 || true; echo
 
-	@[ $(PREFIX) = $(DEFAULT_PREFIX) ] || ( tput bold; tput setaf 4; echo "Information: Installing to non-standard location."; tput sgr0; echo )
+	@[ $(PREFIX) = $(DEFAULT_PREFIX) ] || ( tput bold || true; tput setaf 4 || true; echo "Information: Installing to non-standard location."; tput sgr0 || true; echo )
 
 	[ -d $(install_path) ] || mkdir -p $(install_path)
 	install -v -m 0755 -t $(install_path) $(encrypt_script) $(decrypt_script)
 
-	@tput bold; tput setaf 2; echo; echo "Ok. Scripts have been installed to '$(install_path)'."; tput sgr0
+	@tput bold || true; tput setaf 2 || true; echo; echo "Ok. Scripts have been installed to '$(install_path)'."; tput sgr0 || true
 
 
 uninstall:
 
-	@echo; tput bold; tput setaf 3; echo Target: uninstall; tput sgr0; echo
+	@echo; tput bold || true; tput setaf 3 || true; echo Target: uninstall; tput sgr0 || true; echo
 
 	rm $(install_path)/$(encrypt_script) $(install_path)/$(decrypt_script)
 	rmdir $(install_path) 2> /dev/null || true
 
-	@echo; tput bold; tput setaf 2; echo "Ok. The scripts have been uninstalled from '$(install_path)'."; tput sgr0
+	@echo; tput bold || true; tput setaf 2 || true; echo "Ok. The scripts have been uninstalled from '$(install_path)'."; tput sgr0 || true
 
 
 distrib: root-check SHA512SUM $(encrypt_script) $(decrypt_script) Makefile
 
-	@echo; tput bold; tput setaf 3; echo Target: distrib; tput sgr0; echo
+	@echo; tput bold || true; tput setaf 3 || true; echo Target: distrib; tput sgr0 || true; echo
 
 	rm -f $(distrib_name).tar.xz $(distrib_name).tar.xz.asc
 	rm -f -r $(distrib_name)
@@ -66,15 +66,15 @@ distrib: root-check SHA512SUM $(encrypt_script) $(decrypt_script) Makefile
 	rm -f -r $(distrib_name)
 	gpg -u 7D2E022E39A88ACF3EF6D4498F37AF4CE46008C3 -s -a -o $(distrib_name).tar.xz.asc -b $(distrib_name).tar.xz
 
-	@echo; tput bold; tput setaf 2; echo "Ok. The archive and its signature have been saved as '$(distrib_name).tar.xz' and '$(distrib_name).tar.xz.asc'."; tput sgr0
+	@echo; tput bold || true; tput setaf 2 || true; echo "Ok. The archive and its signature have been saved as '$(distrib_name).tar.xz' and '$(distrib_name).tar.xz.asc'."; tput sgr0 || true
 
 
 clean: root-check
 
-	@echo; tput bold; tput setaf 3; echo Target: clean; tput sgr0; echo
+	@echo; tput bold || true; tput setaf 3 || true; echo Target: clean; tput sgr0 || true; echo
 
 	@if [ ! -f .safeclean-$(distrib_name) ]; then \
-		tput bold; tput setaf 1; echo "Error: Target 'clean' has to be run from within its Makefile's directory!"; tput sgr0; echo; exit 1; \
+		tput bold || true; tput setaf 1 || true; echo "Error: Target 'clean' has to be run from within its Makefile's directory!"; tput sgr0 || true; echo; exit 1; \
 	fi
 
 	@ls -l | grep '^d' > /dev/null || echo "There are no more directories."
@@ -85,7 +85,7 @@ clean: root-check
 
 	@rm -f -v $(distrib_name).tar.xz $(distrib_name).tar.xz.asc
 
-	@echo; tput bold; tput setaf 2; echo "Ok. Directory clean successful."; tput sgr0
+	@echo; tput bold || true; tput setaf 2 || true; echo "Ok. Directory clean successful."; tput sgr0 || true
 
 
 # https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
@@ -95,18 +95,18 @@ force-rebuild-hash-file:
 # real target file
 SHA512SUM: force-rebuild-hash-file root-check $(encrypt_script) $(decrypt_script)
 
-	@echo; tput bold; tput setaf 3; echo Target: SHA512SUM; tput sgr0; echo
+	@echo; tput bold || true; tput setaf 3 || true; echo Target: SHA512SUM; tput sgr0 || true; echo
 
 	rm -f SHA512SUM
 	sha512sum $(encrypt_script) $(decrypt_script) > SHA512SUM
 
-	@echo; tput bold; tput setaf 2; echo "Ok. The 'SHA512SUM' file has been (re-)generated."; tput sgr0
+	@echo; tput bold || true; tput setaf 2 || true; echo "Ok. The 'SHA512SUM' file has been (re-)generated."; tput sgr0 || true
 
 
 # special phony target with code for re-use; something like a function
 root-check:
 
 	@if [ $$(id -u) -eq 0 ]; then \
-		echo; tput bold; tput setaf 3; echo root-check; tput sgr0; echo; \
-		tput bold; tput setaf 1; echo "Error: The target you invoked needs to be run as normal user!"; tput sgr0; echo; exit 1; \
+		echo; tput bold || true; tput setaf 3 || true; echo root-check; tput sgr0 || true; echo; \
+		tput bold || true; tput setaf 1 || true; echo "Error: The target you invoked needs to be run as normal user!"; tput sgr0 || true; echo; exit 1; \
 	fi
