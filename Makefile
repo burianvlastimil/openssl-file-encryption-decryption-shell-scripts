@@ -34,7 +34,7 @@ install: check
 	@[ $(PREFIX) = $(DEFAULT_PREFIX) ] || ( tput bold || true; tput setaf 4 || true; echo "Information: Installing to non-standard location."; tput sgr0 || true; echo )
 
 	[ -d $(install_path) ] || mkdir -p $(install_path)
-	install -v -m 0755 -t $(install_path) $(encrypt_script) $(decrypt_script)
+	install -v -m 0755 $(encrypt_script) $(decrypt_script) $(install_path)
 
 	@tput bold || true; tput setaf 2 || true; echo; echo "Ok. Scripts have been installed to '$(install_path)'."; tput sgr0 || true
 
