@@ -21,8 +21,8 @@ check: $(encrypt_script) $(decrypt_script)
 			if [ $$(uname) = Linux ]; then sha512sum -c SHA512SUM; \
 			elif [ $$(uname) = FreeBSD ]; then shasum -a 512 -c SHA512SUM; \
 			fi && \
-			( tput bold || true; tput setaf 2 || true; echo; echo Ok. You may use 'sudo make install' or '(sudo) make install PREFIX=SomeDir' command now.; tput sgr0 || true ) || \
-			( tput bold || true; tput setaf 1 || true; echo; echo Error: Script files hash sum mismatch!; echo; tput sgr0 || true; exit 1 ) \
+			( tput bold || true; tput setaf 2 || true; echo; echo "Ok. You may use 'sudo make install' or '(sudo) make install PREFIX=SomeDir' command now."; tput sgr0 || true ) || \
+			( tput bold || true; tput setaf 1 || true; echo; echo "Error: Script files hash sum mismatch!" 1>2; echo; tput sgr0 || true; exit 1 ) \
 		) \
 	else \
 		$(MAKE) SHA512SUM; \
@@ -33,12 +33,12 @@ install: check
 
 	@echo; tput bold || true; tput setaf 3 || true; echo Target: install; tput sgr0 || true; echo
 
-	@[ $(PREFIX) = $(DEFAULT_PREFIX) ] || ( tput bold || true; tput setaf 4 || true; echo Information: Installing to non-standard location.; tput sgr0 || true; echo )
+	@[ $(PREFIX) = $(DEFAULT_PREFIX) ] || ( tput bold || true; tput setaf 4 || true; echo "Information: Installing to non-standard location."; tput sgr0 || true; echo )
 
 	[ -d $(install_path) ] || mkdir -p $(install_path)
 	install -v -m 0755 $(encrypt_script) $(decrypt_script) $(install_path)
 
-	@tput bold || true; tput setaf 2 || true; echo; echo Ok. Scripts have been installed to '$(install_path)'.; tput sgr0 || true
+	@tput bold || true; tput setaf 2 || true; echo; echo "Ok. Scripts have been installed to '$(install_path)'."; tput sgr0 || true
 
 
 uninstall:
@@ -48,7 +48,7 @@ uninstall:
 	rm $(install_path)/$(encrypt_script) $(install_path)/$(decrypt_script)
 	rmdir $(install_path) 2> /dev/null || true
 
-	@echo; tput bold || true; tput setaf 2 || true; echo Ok. The scripts have been uninstalled from '$(install_path)'.; tput sgr0 || true
+	@echo; tput bold || true; tput setaf 2 || true; echo "Ok. The scripts have been uninstalled from '$(install_path)'."; tput sgr0 || true
 
 
 distrib: root-check SHA512SUM $(encrypt_script) $(decrypt_script) Makefile
@@ -68,7 +68,7 @@ distrib: root-check SHA512SUM $(encrypt_script) $(decrypt_script) Makefile
 	rm -f -r $(distrib_name)
 	gpg -u 7D2E022E39A88ACF3EF6D4498F37AF4CE46008C3 -s -a -o $(distrib_name).tar.xz.asc -b $(distrib_name).tar.xz
 
-	@echo; tput bold || true; tput setaf 2 || true; echo Ok. The archive and its signature have been saved as '$(distrib_name).tar.xz' and '$(distrib_name).tar.xz.asc'.; tput sgr0 || true
+	@echo; tput bold || true; tput setaf 2 || true; echo "Ok. The archive and its signature have been saved as '$(distrib_name).tar.xz' and '$(distrib_name).tar.xz.asc'."; tput sgr0 || true
 
 
 clean: root-check
@@ -76,18 +76,18 @@ clean: root-check
 	@echo; tput bold || true; tput setaf 3 || true; echo Target: clean; tput sgr0 || true; echo
 
 	@if [ ! -f .safeclean-$(distrib_name) ]; then \
-		tput bold || true; tput setaf 1 || true; echo Error: Target 'clean' has to be run from within its Makefile's directory!; tput sgr0 || true; echo; exit 1; \
+		tput bold || true; tput setaf 1 || true; echo "Error: Target 'clean' has to be run from within its Makefile's directory!" 1>2; tput sgr0 || true; echo; exit 1; \
 	fi
 
 	@ls -l | grep '^d' > /dev/null || echo There are no more directories.
 
 	@for dir in *; do \
-		if [ -d $${dir} ]; then rm -f -r -v $${dir}; fi \
+		if [ -d "$${dir}" ]; then rm -f -r -v "$${dir}"; fi \
 	done
 
 	@rm -f -v $(distrib_name).tar.xz $(distrib_name).tar.xz.asc
 
-	@echo; tput bold || true; tput setaf 2 || true; echo Ok. Directory clean successful.; tput sgr0 || true
+	@echo; tput bold || true; tput setaf 2 || true; echo "Ok. Directory clean successful."; tput sgr0 || true
 
 
 # https://www.gnu.org/software/make/manual/html_node/Force-Targets.html
@@ -113,5 +113,5 @@ root-check:
 
 	@if [ $$(id -u) -eq 0 ]; then \
 		echo; tput bold || true; tput setaf 3 || true; echo root-check; tput sgr0 || true; echo; \
-		tput bold || true; tput setaf 1 || true; echo Error: The target you invoked needs to be run as normal user!; tput sgr0 || true; echo; exit 1; \
+		tput bold || true; tput setaf 1 || true; echo "Error: The target you invoked needs to be run as normal user!" 1>2; tput sgr0 || true; echo; exit 1; \
 	fi
