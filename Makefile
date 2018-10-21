@@ -1,16 +1,22 @@
 .POSIX:
 
 
+.SUFFIXES:
+
+
 DEFAULT_PREFIX := /usr/local/bin
 PREFIX ?= $(DEFAULT_PREFIX)
 install_path := $(PREFIX)
 encrypt_script := encrypt-file-aes256
 decrypt_script := decrypt-file-aes256
 distrib_name := openssl-encryption
-colors_supported := $$(command -v tput > /dev/null 2>&1 && tput setaf 1 > /dev/null 2>&1)
+
+colors_supported := $$( [ -z $$(command -v tput > /dev/null 2>&1 && tput setaf 1 > /dev/null 2>&1) ] )
+
 
 platform_id := $$(uname -s)
-platform := $$( if [ $(platform_id) = Linux ] || \
+platform := $$( \
+				if [ $(platform_id) = Linux ] || \
 				[ $(platform_id) = FreeBSD ] || \
 				[ $(platform_id) = OpenBSD ] || \
 				[ $(platform_id) = NetBSD ]; \
@@ -20,7 +26,6 @@ platform := $$( if [ $(platform_id) = Linux ] || \
 			)
 
 
-.PHONY: check install uninstall distrib clean root-check
 
 
 
@@ -32,7 +37,7 @@ check: $(encrypt_script) $(decrypt_script)
 
 
 
-	@echo; $(colors_supported) && tput bold; $(colors_supported) && tput setaf 3; echo "Target: check"; $(colors_supported) && tput sgr0; echo
+	@echo; if $(colors_supported); then tput bold; fi; $(colors_supported) && tput setaf 3; echo "Target: check"; $(colors_supported) && tput sgr0; echo
 
 	@if [ -f SHA512SUM ]; then \
 		( \
