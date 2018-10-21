@@ -7,7 +7,10 @@ install_path := $(PREFIX)
 encrypt_script := encrypt-file-aes256
 decrypt_script := decrypt-file-aes256
 distrib_name := openssl-encryption
+platform_id := $$(uname)
 
+#platform := $(if $(patsubst Linux,,$(shell uname -s)),BSD or other,Linux)
+#platform := $(shell [ $$(uname) = Linux ] && echo Linux || echo BSD or other)
 
 .PHONY: check install uninstall distrib clean root-check
 
@@ -18,8 +21,9 @@ check: $(encrypt_script) $(decrypt_script)
 
 	@if [ -f SHA512SUM ]; then \
 		( \
-			if [ $$(uname) = Linux ]; then sha512sum -c SHA512SUM; \
-			elif [ $$(uname) = FreeBSD ]; then shasum -a 512 -c SHA512SUM; \
+			if   [ $(platform_id) = Linux ]; then sha512sum -c SHA512SUM; \
+			elif [ $(platform_id) = FreeBSD ]; then shasum -a 512 -c SHA512SUM; \
+			elif [ $(platform_id) = OpenBSD ] || [ $(platform_id) = NetBSD ]; then cksum -a sha512 -C SHA512SUM; \
 			fi && \
 			( tput bold || true; tput setaf 2 || true; echo; echo "Ok. You may use 'sudo make install' or '(sudo) make install PREFIX=SomeDir' command now."; tput sgr0 || true ) || \
 			( tput bold || true; tput setaf 1 || true; echo; echo "Error: Script files hash sum mismatch!" 1>2; echo; tput sgr0 || true; exit 1 ) \
@@ -101,8 +105,8 @@ SHA512SUM: force-rebuild-hash-file root-check $(encrypt_script) $(decrypt_script
 
 	rm -f SHA512SUM
 
-	@if [ $$(uname) = Linux ]; then sha512sum $(encrypt_script) $(decrypt_script) > SHA512SUM; \
-	elif [ $$(uname) = FreeBSD ]; then shasum -a 512 $(encrypt_script) $(decrypt_script) > SHA512SUM; \
+	@if echo $(platform_id) | grep -q Linux; then sha512sum $(encrypt_script) $(decrypt_script) > SHA512SUM; \
+	elif echo $(platform_id) | grep -q BSD; then shasum -a 512 $(encrypt_script) $(decrypt_script) > SHA512SUM; \
 	fi
 
 	@echo; tput bold || true; tput setaf 2 || true; echo "Ok. The 'SHA512SUM' file has been (re-)generated."; tput sgr0 || true
