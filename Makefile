@@ -11,29 +11,56 @@ encrypt_script := encrypt-file-aes256
 decrypt_script := decrypt-file-aes256
 distrib_name := openssl-encryption
 
-colors_supported := $$( [ -z $$(command -v tput > /dev/null 2>&1 && tput setaf 1 > /dev/null 2>&1) ] )
+color_support_test1 := $$( command -v tput > /dev/null 2>&1 )
+#color_support_test2 := $$( tput setaf 1 > /dev/null 2>&1 )
+colors_supported := $$( [ $(color_support_test1) -eq 0 ] )
+#colors_available :=
+# ) ] && echo true || echo false)
 
 
-platform_id := $$(uname -s)
-platform := $$( \
-				if [ $(platform_id) = Linux ] || \
+platform_id = $$(uname -s)
+
+platform = $$( \
+			 if [ $(platform_id) = Linux ] || \
 				[ $(platform_id) = FreeBSD ] || \
 				[ $(platform_id) = OpenBSD ] || \
 				[ $(platform_id) = NetBSD ]; \
 					then echo $(platform_id); \
 					else echo Unrecognized; \
 				fi \
-			)
-
-
-
-
+			 )
 
 
 check: $(encrypt_script) $(decrypt_script)
 
 
-#	@echo $(platform)
+
+#	echo $(colors_supported)
+
+	@if [ $(platform) = Unrecognized ]; then echo This platform: $(platform_id) is currently not supported.; else echo $(platform); fi
+
+	exit 1
+
+
+
+
+
+
+#	echo $(color_support_test)
+
+	if [ $(colors_supported) = true ]; then echo I LOVE colors!; else echo I HATE colors!; fi
+
+	exit 1
+
+
+
+
+
+
+
+
+
+
 
 
 
