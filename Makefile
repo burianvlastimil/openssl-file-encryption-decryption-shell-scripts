@@ -11,46 +11,42 @@ encrypt_script := encrypt-file-aes256
 decrypt_script := decrypt-file-aes256
 distrib_name := openssl-encryption
 
-color_support_test1 := $$( command -v tput > /dev/null 2>&1 )
-#color_support_test2 := $$( tput setaf 1 > /dev/null 2>&1 )
-colors_supported := $$( [ $(color_support_test1) -eq 0 ] )
-#colors_available :=
-# ) ] && echo true || echo false)
-
-
-platform_id = $$(uname -s)
-
+platform_id = $$( uname -s )
 platform = $$( \
-			 if [ $(platform_id) = Linux ] || \
-				[ $(platform_id) = FreeBSD ] || \
-				[ $(platform_id) = OpenBSD ] || \
-				[ $(platform_id) = NetBSD ]; \
-					then echo $(platform_id); \
-					else echo Unrecognized; \
-				fi \
-			 )
+	case $(platform_id) in \
+		Linux | FreeBSD | OpenBSD | NetBSD ) echo $(platform_id) ;; \
+		* ) echo Unrecognized ;; \
+	esac )
+
+
+
+# if [ $(platform_id) = Linux ] || \
+#	[ $(platform_id) = FreeBSD ] || \
+#	[ $(platform_id) = OpenBSD ] || \
+#	[ $(platform_id) = NetBSD ]; \
+#		then 
+#		else ; \
+#	fi
+
+
+
+
+
+
+
+colors_supported != if command -v tput > /dev/null 2>&1 && tput setaf 1 > /dev/null 2>&1; then echo true; else echo false; fi
+#header_color != if $(colors_supported); then tput bold && tput setaf 3; fi
+#reset_colors != if $(colors_supported); then tput sgr0; fi
 
 
 check: $(encrypt_script) $(decrypt_script)
 
+	@echo; $(colors_supported) && ( tput bold; tput setaf 3 ) || true; echo Target: check; $(colors_supported) && tput sgr0 || true; echo
 
 
-#	echo $(colors_supported)
-
-	@if [ $(platform) = Unrecognized ]; then echo This platform: $(platform_id) is currently not supported.; else echo $(platform); fi
-
-	exit 1
-
-
-
-
-
-
-#	echo $(color_support_test)
-
-	if [ $(colors_supported) = true ]; then echo I LOVE colors!; else echo I HATE colors!; fi
-
-	exit 1
+	@echo $(platform); echo
+	@$$( exit 127 )
+	
 
 
 
@@ -60,29 +56,42 @@ check: $(encrypt_script) $(decrypt_script)
 
 
 
+	
+	@if ( if [ -f SHA512SUM ]; then \
+			case $(platform) in \
+				Linux ) sha512sum -c SHA512SUM ;; \
+				FreeBSD ) shasum -a 512 -c SHA512SUM ;; \
+				OpenBSD | NetBSD ) cksum -a sha512 -C SHA512SUM ;; \
+				Unrecognized ) $(MAKE) SHA512SUM ;; \
+			esac \
+		fi ); \
+	then ( \
+		$(colors_supported) && ( tput bold; tput setaf 2 ) || true; \
+		echo; echo "Ok. You may use 'sudo make install' or '(sudo) make install PREFIX=SomeDir' command now."; \
+		$(colors_supported) && tput sgr0 || true \
+	) else ( \
+		$(colors_supported) && ( tput bold; tput setaf 1 ) || true; \
+		echo; echo "Error: Script files hash sum mismatch!" 1>&2; \
+		echo; $(colors_supported) && tput sgr0 || true; \
+		exit 1 \
+	); fi
 
-
-
-
-	@echo; if $(colors_supported); then tput bold; fi; $(colors_supported) && tput setaf 3; echo "Target: check"; $(colors_supported) && tput sgr0; echo
-
-	@if [ -f SHA512SUM ]; then \
-		( \
-			if   [ $(platform_id) = Linux ]; then sha512sum -c SHA512SUM; \
-			elif [ $(platform_id) = FreeBSD ]; then shasum -a 512 -c SHA512SUM; \
-			elif [ $(platform_id) = OpenBSD ] || [ $(platform_id) = NetBSD ]; then cksum -a sha512 -C SHA512SUM; \
-			fi && \
-			( $(colors_supported) && tput bold; $(colors_supported) && tput setaf 2; echo; echo "Ok. You may use 'sudo make install' or '(sudo) make install PREFIX=SomeDir' command now."; $(colors_supported) && tput sgr0 ) || \
-			( $(colors_supported) && tput bold; $(colors_supported) && tput setaf 1; echo; echo "Error: Script files hash sum mismatch!" 1>2; echo; $(colors_supported) && tput sgr0; exit 1 ) \
-		) \
-	else \
-		$(MAKE) SHA512SUM; \
-	fi
+#	&&  ( \
+#		$(colors_supported) && ( tput bold; tput setaf 2 ); \
+#		echo; echo "Ok. You may use 'sudo make install' or '(sudo) make install PREFIX=SomeDir' command now."; \
+#		$(colors_supported) && tput sgr0 \
+#		) \
+#	||  ( \
+#		$(colors_supported) && ( tput bold; tput setaf 1 ); \
+#		echo; echo "Error: Script files hash sum mismatch!" 1>&2; \
+#		echo; $(colors_supported) && tput sgr0; \
+#		exit 1 \
+#		)	 
 
 
 install: check
 
-	@echo; $(colors_supported) && tput bold; $(colors_supported) && tput setaf 3; echo Target: install; $(colors_supported) && tput sgr0; echo
+	@echo; $(colors_supported) && tput bold && tput setaf 3; echo Target: install; $(colors_supported) && tput sgr0; echo
 
 	@[ $(PREFIX) = $(DEFAULT_PREFIX) ] || ( $(colors_supported) && tput bold; $(colors_supported) && tput setaf 4; echo "Information: Installing to non-standard location."; $(colors_supported) && tput sgr0; echo )
 
