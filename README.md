@@ -8,6 +8,15 @@ They are standard [POSIX](https://en.wikipedia.org/wiki/POSIX) shell scripts, wh
 
 Multiple arguments (files) and / or pipes are **currently** not supported.
 
+
+----------------------------------------------------
+
+
+# Requirements (dependencies)
+
+```openssl``` >= 1.1.1, ```df```, ```du```, ```tail```, ```awk```
+
+
 ----------------------------------------------------
 
 
